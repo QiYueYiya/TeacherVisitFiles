@@ -1,11 +1,12 @@
 {
-    "version": "1.0.1",
-    "latest_version": "1.0.1",
+    "version": "1.0.2",
+    "latest_version": "1.0.2",
     "download_url": [
         "https://caiyun.139.com/w/i/2nQQRfzQLvx11"
     ],
     "forced_update": true,
     "update_log": [
-        "修复高分辨率下的页面缩放问题"
+        "修复批量导入时不更新照片",
+        "修复编辑学生信息闪退"
     ]
 }
