@@ -1,12 +1,11 @@
 {
-    "version": "1.0.2",
-    "latest_version": "1.0.2",
+    "version": "1.0.3",
+    "latest_version": "1.0.3",
     "download_url": [
         "https://yun.139.com/shareweb/#/w/i/2nQR6zJaDNdou"
     ],
     "forced_update": true,
     "update_log": [
-        "修复批量导入时不更新照片",
-        "修复编辑学生信息闪退"
+        "修复家访请求失败的Bug"
     ]
 }
