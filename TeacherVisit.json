@@ -1,11 +1,11 @@
 {
-    "version": "1.0.4",
-    "latest_version": "1.0.4",
+    "version": "1.0.5",
+    "latest_version": "1.0.5",
     "download_url": [
         "https://yun.139.com/shareweb/#/w/i/2nQR6zJaDNdou"
     ],
     "forced_update": true,
     "update_log": [
-        "修复照片缓存过大的问题"
+        "修复部分UI界面错乱"
     ]
 }
