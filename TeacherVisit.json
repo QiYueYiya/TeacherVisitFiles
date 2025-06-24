@@ -1,11 +1,12 @@
 {
-    "version": "1.0.1",
-    "latest_version": "1.0.1",
+    "version": "1.0.2",
+    "latest_version": "1.0.2",
     "download_url": [
         "https://alist.qiyueyi.eu.org:8443/TeacherVisit"
     ],
     "forced_update": true,
     "update_log": [
-        "修复平台域名解析错误"
+        "添加右键菜单中文翻译",
+        "添加照片文件名检测"
     ]
 }
