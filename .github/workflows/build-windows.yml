@@ -1,10 +1,6 @@
 name: Build and Release Windows EXE
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'TeacherVisit.json'
   workflow_dispatch:
 
 jobs:
