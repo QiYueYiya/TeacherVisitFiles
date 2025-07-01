@@ -1,9 +1,9 @@
 {
     "latest_version": "1.0.4",
     "download_url": [
-        "https://alist.qiyueyi.eu.org:8443/TeacherVisit"
+        "https://oplist.qiyueyi.eu.org:8443/TeacherVisit"
     ],
-    "home_url": "https://alist.qiyueyi.eu.org:8443/TeacherVisit",
+    "home_url": "https://oplist.qiyueyi.eu.org:8443/TeacherVisit",
     "help_path": "/help/GETCOOKIE.md",
     "forced_update": true,
     "update_log": [
