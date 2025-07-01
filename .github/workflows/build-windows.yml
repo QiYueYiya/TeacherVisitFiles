@@ -1,0 +1,117 @@
+name: Build and Release Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'TeacherVisit.json'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Clone TeacherVisit Repo
+        uses: actions/checkout@v4
+        with:
+          repository: QiYueYiya/TeacherVisit
+          token: ${{ secrets.TeacherVisit_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Extract version
+        id: get_version
+        shell: python
+        run: |
+          import json, os
+          with open('TeacherVisit.json', encoding='utf-8') as f:
+              data = json.load(f)
+          version = data.get('latest_version', '')
+          if not version:
+              raise Exception('Version not found!')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+              print(f'ver={version}', file=f)
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --noconfirm --onefile --windowed --add-data "student_info.xlsx;." --add-data "TeacherVisit.json;." --add-data "widgets_zh_CN.qm;." main.py
+
+      - name: Rename exe with version
+        run: |
+          move dist\main.exe "dist\TeacherVisit.exe"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TeacherVisit ${{ steps.get_version.outputs.ver }}
+          path: "dist/TeacherVisit.exe"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.ver }}
+          name: TeacherVisit ${{ steps.get_version.outputs.ver }}
+          files: "dist/TeacherVisit.exe"
+
+      - name: Push TeacherVisit.json to TeacherVisitFiles Repo
+        uses: actions/checkout@v4
+        with:
+          path: filesrepo
+
+      - name: Commit and push TeacherVisit.json
+        run: |
+          cp TeacherVisit.json filesrepo/TeacherVisit.json
+          cd filesrepo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add TeacherVisit.json
+          git commit -m "update TeacherVisit.json for ${{ steps.get_version.outputs.ver }}" || echo "No changes to commit"
+          git push
+
+  sync:
+    runs-on: ubuntu-latest
+    needs: build
+    if: success()
+    steps:
+      - name: Checkout GitHub repository
+        uses: actions/checkout@v4
+        
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Add Gitee SSH Key
+        env:
+          GITEE_SSH_KEY: ${{ secrets.GITEE_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$GITEE_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan gitee.com >> ~/.ssh/known_hosts
+
+      - name: Clone Gitee repository
+        run: |
+          git clone git@gitee.com:qiyueyi/TeacherVisitFiles.git gitee-repo-linux
+
+      - name: Copy file
+        run: |
+          cp TeacherVisit.json gitee-repo-linux/TeacherVisit.json
+
+      - name: Commit and push
+        working-directory: ./gitee-repo-linux
+        run: |
+          git add TeacherVisit.json
+          git commit -m "Update TeacherVisit.json from GitHub"
+          git push origin main
