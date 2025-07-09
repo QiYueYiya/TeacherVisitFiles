@@ -1,14 +1,13 @@
 {
-    "latest_version": "1.0.6",
+    "latest_version": "1.0.7",
     "download_url": [
-        "https://oplist.qiyueyi.eu.org:8443/TeacherVisit"
+        "https://oplist.070107.xyz:8443/TeacherVisit"
     ],
-    "home_url": "https://oplist.qiyueyi.eu.org:8443/TeacherVisit",
+    "home_url": "https://oplist.070107.xyz:8443/TeacherVisit",
     "help_path": "/help/GETCOOKIE.md",
     "forced_update": true,
     "update_log": [
-        "Optimize installation interface",
-        "Fix cache read errors",
-        "Add icon"
+        "Fix device code change",
+        "Fix check logic"
     ]
 }
