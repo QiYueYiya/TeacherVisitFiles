@@ -37,19 +37,34 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
               print(f'ver={version}', file=f)
 
+      - name: Edit file_version_info.txt
+        id: edit_file_version_info
+        shell: python
+        env:
+          latest_version: ${{ steps.get_version.outputs.ver }}
+        run: |
+          info_path = "file_version_info.txt"
+          major, minor, patch = map(int, latest_version.split('.'))
+          version_tuple = f"({major}, {minor}, {patch}, 0)"
+          with open(info_path, 'r', encoding='utf-8') as file:
+              content = file.read()
+          content = re.sub(r'\(\d+, \d+, \d+, \d+\)', version_tuple, content)
+          content = re.sub(r"u'\d+\.\d+\.\d+'", f"u'{latest_version}'", content)
+          with open(info_path, 'w', encoding='utf-8') as file:
+              file.write(content)
+
       - name: Build with PyInstaller
         run: |
-          pyinstaller --noconfirm --onefile --windowed --add-data "student_info.xlsx;." --add-data "TeacherVisit.json;." --add-data "widgets_zh_CN.qm;." main.py
-
-      - name: Rename exe with version
-        run: |
+          pyinstaller main.spec
           move dist\main.exe "dist\TeacherVisit.exe"
+          pyinstaller install.spec
+          move dist\install.exe "dist\TeacherVisit_${{ steps.get_version.outputs.ver }}.exe"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: TeacherVisit ${{ steps.get_version.outputs.ver }}
-          path: "dist/TeacherVisit.exe"
+          path: "dist/TeacherVisit_${{ steps.get_version.outputs.ver }}.exe"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -58,7 +73,7 @@ jobs:
         with:
           tag_name: ${{ steps.get_version.outputs.ver }}
           name: TeacherVisit ${{ steps.get_version.outputs.ver }}
-          files: "dist/TeacherVisit.exe"
+          files: "dist/TeacherVisit_${{ steps.get_version.outputs.ver }}.exe"
 
       - name: Push TeacherVisit.json to TeacherVisitFiles Repo
         uses: actions/checkout@v4
