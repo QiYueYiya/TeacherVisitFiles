@@ -43,6 +43,8 @@ jobs:
         env:
           latest_version: ${{ steps.get_version.outputs.ver }}
         run: |
+          import re, os
+          latest_version = os.environ['latest_version']
           info_path = "file_version_info.txt"
           major, minor, patch = map(int, latest_version.split('.'))
           version_tuple = f"({major}, {minor}, {patch}, 0)"
