@@ -120,7 +120,7 @@ jobs:
 
       - name: Copy file
         run: |
-          cp files/TeacherVisit.json gitee-repo-linux/TeacherVisit.json
+          cp TeacherVisit.json gitee-repo-linux/TeacherVisit.json
 
       - name: Commit and push
         working-directory: ./gitee-repo-linux
