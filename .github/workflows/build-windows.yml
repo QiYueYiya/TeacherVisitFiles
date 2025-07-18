@@ -29,7 +29,7 @@ jobs:
         shell: python
         run: |
           import json, os
-          with open('TeacherVisit.json', encoding='utf-8') as f:
+          with open('files\TeacherVisit.json', encoding='utf-8') as f:
               data = json.load(f)
           version = data.get('latest_version', '')
           if not version:
@@ -82,7 +82,7 @@ jobs:
 
       - name: Commit and push TeacherVisit.json
         run: |
-          cp TeacherVisit.json filesrepo/TeacherVisit.json
+          cp files/TeacherVisit.json filesrepo/TeacherVisit.json
           cd filesrepo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -118,7 +118,7 @@ jobs:
 
       - name: Copy file
         run: |
-          cp TeacherVisit.json gitee-repo-linux/TeacherVisit.json
+          cp files/TeacherVisit.json gitee-repo-linux/TeacherVisit.json
 
       - name: Commit and push
         working-directory: ./gitee-repo-linux
