@@ -1,12 +1,11 @@
 {
-    "latest_version": "1.0.8",
+    "latest_version": "1.0.9",
     "download_url": [
-        "https://oplist.070107.xyz:8443/TeacherVisit"
+        "https://oplist.070107.xyz/TeacherVisit"
     ],
-    "home_url": "https://oplist.070107.xyz:8443/TeacherVisit",
-    "help_path": "/help/GETCOOKIE.md",
+    "home_url": "https://oplist.070107.xyz/TeacherVisit",
+    "help_path": "/help/README.md",
     "forced_update": true,
     "update_log": [
-        "Fix: Photo file name detection"
     ]
 }
