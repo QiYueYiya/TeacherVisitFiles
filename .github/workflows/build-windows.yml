@@ -1,4 +1,4 @@
-name: Build and Release Windows EXE
+name: ${{ github.event.inputs.run_name || 'Build and Release Windows EXE' }}
 
 on:
   workflow_dispatch:
@@ -6,7 +6,6 @@ on:
       run-name:
         description: '自定义本次运行的名称'
         required: false
-        default: 'manual-run'
         type: string
 
 jobs:
