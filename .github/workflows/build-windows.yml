@@ -61,6 +61,13 @@ jobs:
           move dist\main.exe "dist\TeacherVisit.exe"
           pyinstaller install.spec
           move dist\install.exe "dist\TeacherVisit_${{ steps.get_version.outputs.ver }}.exe"
+      
+      - name: Create Tag for TeacherFiles Repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.get_version.outputs.ver }}"
+          git push origin "${{ steps.get_version.outputs.ver }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
