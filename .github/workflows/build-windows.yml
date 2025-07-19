@@ -1,4 +1,4 @@
-name: ${{ github.event.inputs.run_name || 'Build and Release Windows EXE' }}
+name: 'Build and Release Windows EXE'
 
 on:
   workflow_dispatch:
