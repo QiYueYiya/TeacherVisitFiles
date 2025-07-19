@@ -2,11 +2,6 @@ name: 'Build and Release Windows EXE'
 
 on:
   workflow_dispatch:
-    inputs:
-      run-name:
-        description: '自定义本次运行的名称'
-        required: false
-        type: string
 
 jobs:
   build:
