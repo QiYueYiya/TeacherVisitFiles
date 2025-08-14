@@ -109,8 +109,10 @@ jobs:
     needs: build
     if: success()
     steps:
-      - name: Checkout GitHub repository
+      - name: Clone TeacherVisitFiles Repo
         uses: actions/checkout@v4
+        with:
+          ref: main
         
       - name: Configure Git
         run: |
@@ -126,16 +128,13 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan gitee.com >> ~/.ssh/known_hosts
 
-      - name: Clone Gitee repository
+      - name: Clone TeacherVisitFiles From Gitee
         run: |
-          git clone git@gitee.com:qiyueyi/TeacherVisitFiles.git gitee-repo-linux
-
-      - name: Copy file
-        run: |
-          cp TeacherVisit.json gitee-repo-linux/TeacherVisit.json
+          git clone git@gitee.com:qiyueyi/TeacherVisitFiles.git gitee-TeacherVisitFiles
+          cp TeacherVisit.json gitee-TeacherVisitFiles/TeacherVisit.json
 
       - name: Commit and push
-        working-directory: ./gitee-repo-linux
+        working-directory: ./gitee-TeacherVisitFiles
         run: |
           git add TeacherVisit.json
           git commit -m "Update TeacherVisit.json from GitHub"
