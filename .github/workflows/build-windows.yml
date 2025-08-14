@@ -2,16 +2,32 @@ name: 'Build and Release Windows EXE'
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: '版本号（格式：x.x.x）'
+        required: true
+        type: string
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
     steps:
       - name: Clone TeacherVisit Repo
         uses: actions/checkout@v4
         with:
           repository: QiYueYiya/TeacherVisit
-          token: ${{ secrets.TeacherVisit_TOKEN }}
+          ref: ${{ env.VERSION }}
+          token: ${{ secrets.TEACHERVISIT_TOKEN }}
+
+      - name: Clone TeacherVisitFiles Repo
+        uses: actions/checkout@v4
+        with:
+          path: TeacherVisitFiles
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -24,34 +40,35 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Extract version
-        id: get_version
+      - name: Set version
+        id: set_version
         shell: python
+        env:
+          version: ${{ env.VERSION }}
         run: |
           import json, os
-          with open('files\TeacherVisit.json', encoding='utf-8') as f:
+          path = 'files/TeacherVisit.json'
+          with open(path, encoding='utf-8') as f:
               data = json.load(f)
-          version = data.get('latest_version', '')
-          if not version:
-              raise Exception('Version not found!')
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
-              print(f'ver={version}', file=f)
+          data['latest_version'] = os.environ['version']
+          with open(path, 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=4)
 
       - name: Edit file_version_info.txt
         id: edit_file_version_info
         shell: python
         env:
-          latest_version: ${{ steps.get_version.outputs.ver }}
+          version: ${{ env.VERSION }}
         run: |
           import re, os
-          latest_version = os.environ['latest_version']
+          version = os.environ['version']
           info_path = "file_version_info.txt"
-          major, minor, patch = map(int, latest_version.split('.'))
+          major, minor, patch = map(int, version.split('.'))
           version_tuple = f"({major}, {minor}, {patch}, 0)"
           with open(info_path, 'r', encoding='utf-8') as file:
               content = file.read()
           content = re.sub(r'\(\d+, \d+, \d+, \d+\)', version_tuple, content)
-          content = re.sub(r"u'\d+\.\d+\.\d+'", f"u'{latest_version}'", content)
+          content = re.sub(r"u'\d+\.\d+\.\d+'", f"u'{version}'", content)
           with open(info_path, 'w', encoding='utf-8') as file:
               file.write(content)
 
@@ -60,44 +77,32 @@ jobs:
           pyinstaller main.spec
           move dist\main.exe "dist\TeacherVisit.exe"
           pyinstaller install.spec
-          move dist\install.exe "dist\TeacherVisit_${{ steps.get_version.outputs.ver }}.exe"
-      
-      - name: Create Tag for TeacherFiles Repo
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${{ steps.get_version.outputs.ver }}"
-          git push origin "${{ steps.get_version.outputs.ver }}"
+          move dist\install.exe "dist\TeacherVisit_${{ env.VERSION }}.exe"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TeacherVisit ${{ steps.get_version.outputs.ver }}
-          path: "dist/TeacherVisit_${{ steps.get_version.outputs.ver }}.exe"
+          name: TeacherVisit ${{ env.VERSION }}
+          path: "dist/TeacherVisit_${{ env.VERSION }}.exe"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_version.outputs.ver }}
-          name: TeacherVisit ${{ steps.get_version.outputs.ver }}
-          files: "dist/TeacherVisit_${{ steps.get_version.outputs.ver }}.exe"
-
-      - name: Push TeacherVisit.json to TeacherVisitFiles Repo
-        uses: actions/checkout@v4
-        with:
-          path: filesrepo
+          tag_name: ${{ env.VERSION }}
+          name: TeacherVisit ${{ env.VERSION }}
+          files: "dist/TeacherVisit_${{ env.VERSION }}.exe"
 
       - name: Commit and push TeacherVisit.json
         run: |
-          cp files/TeacherVisit.json filesrepo/TeacherVisit.json
-          cd filesrepo
+          cp files/TeacherVisit.json TeacherVisitFiles/TeacherVisit.json
+          cd TeacherVisitFiles
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add TeacherVisit.json
-          git commit -m "update TeacherVisit.json for ${{ steps.get_version.outputs.ver }}" || echo "No changes to commit"
-          git push
+          git commit -m "update TeacherVisit.json for ${{ env.VERSION }}" || echo "No changes to commit"
+          git push origin HEAD:main
 
   sync:
     runs-on: ubuntu-latest
