@@ -1,11 +1,10 @@
 {
     "latest_version": "1.1.2",
     "download_url": [
-        "https://oplist.070107.xyz:8443/TeacherVisit"
+        "https://oplist.qiyueyi.top/TeacherVisit"
     ],
-    "home_url": "https://oplist.070107.xyz:8443/TeacherVisit",
+    "home_url": "https://oplist.qiyueyi.top/TeacherVisit",
     "help_path": "/help/README.md",
     "forced_update": true,
-    "update_log": [
-    ]
+    "update_log": []
 }
